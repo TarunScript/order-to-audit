@@ -9,6 +9,8 @@ from app.core.settings import settings
 from app.modules.auth import router as auth_router
 from app.modules.masters.router import router as masters_router
 from app.modules.inventory.router import router as inventory_router
+from app.modules.production.router import router as production_router
+from app.modules.costing.router import router as costing_router
 
 
 app = FastAPI(
@@ -74,5 +76,7 @@ async def health_check():
 app.include_router(auth_router, prefix=settings.API_PREFIX)
 app.include_router(masters_router, prefix=settings.API_PREFIX)
 app.include_router(inventory_router, prefix=settings.API_PREFIX)
+app.include_router(production_router, prefix=settings.API_PREFIX)
+app.include_router(costing_router, prefix=settings.API_PREFIX)
 
 
