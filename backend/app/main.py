@@ -12,6 +12,7 @@ from app.modules.inventory.router import router as inventory_router
 from app.modules.production.router import router as production_router
 from app.modules.costing.router import router as costing_router
 from app.modules.sales.router import router as sales_router
+from app.modules.sales.payments_router import router as payments_router
 
 
 app = FastAPI(
@@ -80,5 +81,6 @@ app.include_router(inventory_router, prefix=settings.API_PREFIX)
 app.include_router(production_router, prefix=settings.API_PREFIX)
 app.include_router(costing_router, prefix=settings.API_PREFIX)
 app.include_router(sales_router, prefix=settings.API_PREFIX)
+app.include_router(payments_router, prefix=settings.API_PREFIX)
 
 
