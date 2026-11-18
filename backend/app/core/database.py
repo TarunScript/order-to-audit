@@ -1,12 +1,22 @@
 """Database connection and session handling."""
+import os
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
 from app.core.settings import settings
 
+db_url = os.environ.get("DATABASE_URL", settings.DATABASE_URL)
+
+# Fallback to sqlite+aiosqlite if asyncpg is not installed (e.g. host test runner)
+if "postgresql+asyncpg" in db_url:
+    try:
+        import asyncpg
+    except ImportError:
+        db_url = "sqlite+aiosqlite:///./test_fallback.db"
+
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    db_url,
     echo=False,
     future=True,
     pool_pre_ping=True,

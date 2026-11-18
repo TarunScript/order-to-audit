@@ -8,6 +8,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.settings import settings
 from app.modules.auth import router as auth_router
 from app.modules.masters.router import router as masters_router
+from app.modules.inventory.router import router as inventory_router
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -71,4 +73,6 @@ async def health_check():
 # Include Routers
 app.include_router(auth_router, prefix=settings.API_PREFIX)
 app.include_router(masters_router, prefix=settings.API_PREFIX)
+app.include_router(inventory_router, prefix=settings.API_PREFIX)
+
 

@@ -22,11 +22,13 @@ from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 
+PK_TYPE = BigInteger().with_variant(Integer, "sqlite")
+
 
 class Setting(Base):
     __tablename__ = "settings"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     key = Column(String(100), unique=True, nullable=False)
     value = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -36,7 +38,7 @@ class Setting(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     username = Column(String(50), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False)
@@ -53,7 +55,7 @@ class User(Base):
 class Item(Base):
     __tablename__ = "items"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     sku = Column(String(50), unique=True, nullable=False)
     name = Column(String(200), nullable=False)
     type = Column(String(20), nullable=False)
@@ -81,7 +83,7 @@ class Item(Base):
 class ItemUnit(Base):
     __tablename__ = "item_units"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     item_id = Column(BigInteger, ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
     unit = Column(String(20), nullable=False)
     factor_to_base = Column(Integer, nullable=False)
@@ -99,7 +101,7 @@ class ItemUnit(Base):
 class Supplier(Base):
     __tablename__ = "suppliers"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     name = Column(String(200), nullable=False)
     gstin = Column(String(15), nullable=True)
     phone = Column(String(20), nullable=True)
@@ -112,7 +114,7 @@ class Supplier(Base):
 class Customer(Base):
     __tablename__ = "customers"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     name = Column(String(200), nullable=False)
     type = Column(String(20), nullable=False)
     gstin = Column(String(15), nullable=True)
@@ -137,7 +139,7 @@ class Customer(Base):
 class PriceList(Base):
     __tablename__ = "price_list"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     item_id = Column(BigInteger, ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
     price_paise = Column(BigInteger, nullable=False)
     effective_from = Column(Date, nullable=False)
@@ -154,7 +156,7 @@ class PriceList(Base):
 class CustomerPrice(Base):
     __tablename__ = "customer_prices"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     customer_id = Column(BigInteger, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
     price_paise = Column(BigInteger, nullable=False)
@@ -173,7 +175,7 @@ class CustomerPrice(Base):
 class Bom(Base):
     __tablename__ = "boms"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     product_item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     version = Column(Integer, server_default="1", nullable=False)
     yield_packets = Column(Integer, nullable=False)
@@ -192,7 +194,7 @@ class Bom(Base):
 class BomLine(Base):
     __tablename__ = "bom_lines"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     bom_id = Column(BigInteger, ForeignKey("boms.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     qty_base = Column(BigInteger, nullable=False)
@@ -210,7 +212,7 @@ class BomLine(Base):
 class Purchase(Base):
     __tablename__ = "purchases"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     supplier_id = Column(BigInteger, ForeignKey("suppliers.id"), nullable=False)
     bill_no = Column(String(50), nullable=True)
     purchase_date = Column(Date, nullable=False)
@@ -229,7 +231,7 @@ class Purchase(Base):
 class PurchaseLine(Base):
     __tablename__ = "purchase_lines"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     purchase_id = Column(BigInteger, ForeignKey("purchases.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     qty_base = Column(BigInteger, nullable=False)
@@ -251,7 +253,7 @@ class PurchaseLine(Base):
 class ProductionRun(Base):
     __tablename__ = "production_runs"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     run_no = Column(String(50), unique=True, nullable=False)
     bom_id = Column(BigInteger, ForeignKey("boms.id"), nullable=False)
     product_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
@@ -288,7 +290,7 @@ class ProductionRun(Base):
 class ProductionRunLine(Base):
     __tablename__ = "production_run_lines"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     run_id = Column(BigInteger, ForeignKey("production_runs.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     planned_qty_base = Column(BigInteger, nullable=False)
@@ -310,7 +312,7 @@ class ProductionRunLine(Base):
 class Order(Base):
     __tablename__ = "orders"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     order_no = Column(String(50), unique=True, nullable=False)
     client_uuid = Column(String(36), unique=True, nullable=False)
     customer_id = Column(BigInteger, ForeignKey("customers.id"), nullable=False)
@@ -335,7 +337,7 @@ class Order(Base):
 class OrderLine(Base):
     __tablename__ = "order_lines"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     order_id = Column(BigInteger, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     qty = Column(Integer, nullable=False)
@@ -357,7 +359,7 @@ class OrderLine(Base):
 class Invoice(Base):
     __tablename__ = "invoices"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     invoice_no = Column(String(30), unique=True, nullable=False)
     fy = Column(String(10), nullable=False)
     order_id = Column(BigInteger, ForeignKey("orders.id"), nullable=False)
@@ -390,7 +392,7 @@ class Invoice(Base):
 class InvoiceLine(Base):
     __tablename__ = "invoice_lines"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     invoice_id = Column(BigInteger, ForeignKey("invoices.id", ondelete="CASCADE"), nullable=False)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     hsn_code = Column(String(20), nullable=True)
@@ -416,7 +418,7 @@ class InvoiceLine(Base):
 class CreditNote(Base):
     __tablename__ = "credit_notes"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     cn_no = Column(String(30), unique=True, nullable=False)
     invoice_id = Column(BigInteger, ForeignKey("invoices.id"), nullable=False)
     reason = Column(Text, nullable=False)
@@ -434,7 +436,7 @@ class CreditNote(Base):
 class Dispatch(Base):
     __tablename__ = "dispatches"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     invoice_id = Column(BigInteger, ForeignKey("invoices.id"), nullable=False)
     dispatched_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     dispatched_by = Column(BigInteger, ForeignKey("users.id"), nullable=False)
@@ -448,7 +450,7 @@ class Dispatch(Base):
 class Payment(Base):
     __tablename__ = "payments"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     customer_id = Column(BigInteger, ForeignKey("customers.id"), nullable=False)
     invoice_id = Column(BigInteger, ForeignKey("invoices.id"), nullable=True)
     amount_paise = Column(BigInteger, nullable=False)
@@ -469,7 +471,7 @@ class Payment(Base):
 class StockLedger(Base):
     __tablename__ = "stock_ledger"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     item_id = Column(BigInteger, ForeignKey("items.id"), nullable=False)
     movement_type = Column(String(30), nullable=False)
     qty_base = Column(BigInteger, nullable=False)  # signed
@@ -500,7 +502,7 @@ class StockLedger(Base):
 class ItemBalance(Base):
     __tablename__ = "item_balances"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     item_id = Column(BigInteger, ForeignKey("items.id"), unique=True, nullable=False)
     qty_base = Column(BigInteger, server_default="0", nullable=False)
     value_paise = Column(BigInteger, server_default="0", nullable=False)
@@ -513,7 +515,7 @@ class ItemBalance(Base):
 class AuditLog(Base):
     __tablename__ = "audit_log"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, ForeignKey("users.id"), nullable=True)
     action = Column(String(50), nullable=False)
     entity_type = Column(String(50), nullable=False)
@@ -532,7 +534,7 @@ class AuditLog(Base):
 class Sequence(Base):
     __tablename__ = "sequences"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(PK_TYPE, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
     fy = Column(String(10), nullable=False)
     next_value = Column(Integer, server_default="1", nullable=False)
