@@ -16,10 +16,14 @@ from app.core.database import get_db
 from app.core.settings import settings
 from app.models import User
 
-# Graceful passlib/bcrypt or hashlib fallback
+# Secure password hashing via native bcrypt with PBKDF2 compatibility
 try:
-    from passlib.context import CryptContext
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    import bcrypt
+    def get_password_hash(password: str) -> str:
+        pwd_bytes = password.encode("utf-8")
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(pwd_bytes, salt).decode("utf-8")
+
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         if hashed_password.startswith("$pbkdf2$"):
             parts = hashed_password.split("$")
@@ -27,10 +31,10 @@ try:
             expected = parts[3]
             calculated = hashlib.pbkdf2_hmac("sha256", plain_password.encode(), salt.encode(), 100000).hex()
             return hmac.compare_digest(expected, calculated)
-        return pwd_context.verify(plain_password, hashed_password)
-
-    def get_password_hash(password: str) -> str:
-        return pwd_context.hash(password)
+        try:
+            return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+        except Exception:
+            return False
 except ImportError:
     def get_password_hash(password: str) -> str:
         salt = hashlib.sha256(str(time.time()).encode()).hexdigest()[:16]
@@ -39,7 +43,6 @@ except ImportError:
 
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         if not hashed_password.startswith("$pbkdf2$"):
-            # Simple check or dummy match for development
             return plain_password == hashed_password
         parts = hashed_password.split("$")
         salt = parts[2]
